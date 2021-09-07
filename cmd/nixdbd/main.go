@@ -45,6 +45,11 @@ func cmdServe(cmd *cli.Cmd) {
 		groups  = cmd.StringsOpt("groups", []string{"testuser"}, "comma separated list of authorized groups")
 
 		secretKey = cmd.StringOpt("secretKey", "/etc/nixdb.key", "path to secret key")
+
+		autoTLS   = cmd.BoolOpt("autoTLS", false, "enable auto tls (Let' Encrypt)")
+		enableTLS = cmd.BoolOpt("enableTLS", false, "enable tls")
+		tlsCert   = cmd.StringOpt("tlsCert", "", "path to tls certificate")
+		tlsKey    = cmd.StringOpt("tlsKey", "", "path to tls key")
 	)
 
 	cmd.Action = func() {
@@ -68,7 +73,15 @@ func cmdServe(cmd *cli.Cmd) {
 
 		registerEndpoints(e, db, key)
 
-		e.Logger.Info(e.Start(*addr))
+		switch true {
+		case *autoTLS:
+			e.Logger.Info(e.StartAutoTLS(*addr))
+		case *enableTLS:
+			e.Logger.Info(e.StartTLS(*addr, *tlsCert, *tlsKey))
+		default:
+			e.Logger.Info(e.Start(*addr))
+		}
+
 	}
 }
 
