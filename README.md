@@ -15,7 +15,5 @@ This is under heavy development but as of now we have following
 
 ### TODO
 
-- Server Read-only hosts file
-- TLS support
 - Support BSD Style passwd and groups
 - CLI Client that provides synchronsiation on client hosts
