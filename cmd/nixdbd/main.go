@@ -34,6 +34,7 @@ func registerEndpoints(e *echo.Echo, db nixdb.Database, secret JWTSecretKey) {
 
 	api.GET("/passwd", H.GETUsers)
 	api.GET("/group", H.GETGroups)
+	api.GET("/hosts", H.GETHosts)
 }
 
 func cmdServe(cmd *cli.Cmd) {
@@ -66,8 +67,10 @@ func cmdServe(cmd *cli.Cmd) {
 		e.Use(middleware.Recover())
 		e.Use(middleware.Logger())
 		db := nixdb.NewDB(*baseDir, uint(*minUID), uint(*minGID))
-		db.Update("passwd")
-		db.Update("group")
+
+		if err := db.Update(); err != nil {
+			log.Fatalln(err.Error())
+		}
 
 		e.Use(AuthMiddleware(key, db, *groups))
 

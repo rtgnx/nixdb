@@ -34,7 +34,7 @@ func BasicAuthValidator(secret JWTSecretKey, db nixdb.Database, authorizedGroups
 			return false, nil
 		}
 
-		if err := db.Update("passwd"); err != nil {
+		if err := db.Update(); err != nil {
 			return false, err
 		}
 

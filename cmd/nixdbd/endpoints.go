@@ -24,7 +24,7 @@ func (h HTTP) GETLogin(ctx echo.Context) error {
 
 func (h HTTP) GETUsers(ctx echo.Context) error {
 
-	if err := h.db.Update("passwd"); err != nil {
+	if err := h.db.Update(); err != nil {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
@@ -33,11 +33,19 @@ func (h HTTP) GETUsers(ctx echo.Context) error {
 
 func (h HTTP) GETGroups(ctx echo.Context) error {
 
-	if err := h.db.Update("group"); err != nil {
+	if err := h.db.Update(); err != nil {
 		return ctx.NoContent(http.StatusInternalServerError)
 	}
 
 	return ctx.JSON(http.StatusOK, h.db.Groups)
+}
+
+func (h HTTP) GETHosts(ctx echo.Context) error {
+	if err := h.db.Update(); err != nil {
+		return ctx.NoContent(http.StatusInternalServerError)
+	}
+
+	return ctx.JSON(http.StatusOK, h.db.Hosts)
 }
 
 func AttachProxyAuthHeaders(ctx echo.Context, user nixdb.PasswdEntry) {

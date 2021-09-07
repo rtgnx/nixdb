@@ -10,6 +10,7 @@ type Database struct {
 	MinGID  uint
 	Users   Passwd
 	Groups  Groups
+	Hosts   Hosts
 	BaseDir string
 }
 
@@ -22,14 +23,12 @@ func NewDB(baseDir string, minUID, minGID uint) Database {
 	}
 }
 
-func (db *Database) Update(dbName string) error {
-	switch dbName {
-	case "passwd":
-		return db.updatePasswd()
-	case "group":
-		return db.updateGroup()
+func (db *Database) Update() error {
+	for _, f := range []func() error{db.updateGroup, db.updateHosts, db.updatePasswd} {
+		if err := f(); err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
@@ -67,6 +66,19 @@ func (db *Database) updateGroup() error {
 			db.Groups = append(db.Groups[:i], db.Groups[i+1:]...)
 		}
 	}
+
+	return nil
+}
+
+func (db *Database) updateHosts() error {
+	groupPath := path.Join(db.BaseDir, "hosts")
+	fd, err := os.Open(groupPath)
+
+	if err != nil {
+		return err
+	}
+
+	db.Hosts.Read(fd)
 
 	return nil
 }
